@@ -4,10 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server/server.js",
-    "test": "mocha tests/testServer.js && gulp buildTest && node node_modules/mocha-phantomjs/bin/mocha-phantomjs ./tests/reactTests.html"
+    "start": "nodemon server/server.js"
   },
-  "pre-commit": ["test"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MThorsell/thesis.git"
@@ -34,7 +32,6 @@
     "jsdom": "^8.1.0",
     "jsonwebtoken": "^5.7.0",
     "mocha": "^2.4.5",
-    "mocha-phantomjs": "^4.0.2",
     "morgan": "^1.7.0",
     "node-env-file": "^0.1.8",
     "react": "^0.14.7",
@@ -44,10 +41,8 @@
   },
   "devDependencies": {
     "jest": "^0.1.40",
-    "pre-commit": "^1.1.2",
     "react": "^0.14.7",
     "react-addons-test-utils": "^0.14.7",
     "react-dom": "^0.14.7"
-  },
-  "engine": "node 5.5.0"
+  }
 }
