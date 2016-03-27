@@ -1,7 +1,6 @@
 var aws = require('aws-sdk');
 var bcrypt = require('bcrypt-nodejs');
 var jwt = require('jsonwebtoken');
-var sharp = require('sharp');
 
 aws.config.update({
   accessKeyId: "fakeAccessKey",
@@ -22,7 +21,7 @@ module.exports = {
       TableName : "Spots",
       Key: {spotId: 0}
     };
-    //use 'lastId' property of item of spotId: 0 to determine spotId of new spot 
+    //use 'lastId' property of item of spotId: 0 to determine spotId of new spot
     dbSchema.get(params, function(err, data) {
       if (err) {
         console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
@@ -93,7 +92,7 @@ module.exports = {
                     } else {
                       success(newSpot);
                     }
-                  });                  
+                  });
                 }
               });
             }
@@ -726,7 +725,7 @@ module.exports = {
                     ':followers': [{'userId': user.Items[0].userId, 'username': user.Items[0].username}]
                   }
                 };
-                //update followers property of user being followed 
+                //update followers property of user being followed
                 dbSchema.update(params, function(err, follower) {
                   if (err) {
                     console.error(err);
@@ -852,20 +851,5 @@ var tokenizer = function (user) {
 };
 
 var imageResize = function(image, success, fail) {
-
-  image = image.split(',')[1];
-  image = new Buffer(image, 'base64');
-
-  sharp(image)
-  .resize(300, 300)
-  .background({r: 230, g: 230, b: 230, a: 1})
-  .flatten()
-  .jpeg()
-  .toBuffer(function(err, buffer, info) {
-    if (err) {
-      fail(err);
-    } else {
-      success('data:image/jpeg;base64,' + buffer.toString('base64'));
-    }
-  });
+  success(image);
 };

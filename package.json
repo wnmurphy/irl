@@ -37,7 +37,6 @@
     "node-env-file": "^0.1.8",
     "react": "^0.14.7",
     "request": "^2.69.0",
-    "sharp": "^0.13.1",
     "socket.io": "^1.4.5"
   },
   "devDependencies": {
