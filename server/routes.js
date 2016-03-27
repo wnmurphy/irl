@@ -1,4 +1,3 @@
-var db = require('../db/db.js');
 var helpers = require('./helpers.js');
 
 module.exports = function(app, express, io) {
@@ -15,8 +14,9 @@ module.exports = function(app, express, io) {
     helpers.checkToken(JSON.parse(req.headers.token), function (decoded) {
       spot.creatorId = decoded.userId;
       spot.creator = decoded.username;
-      helpers.createSpot(spot, function(spot_id) {
-        res.json(spot_id);
+      helpers.createSpot(spot, function(newSpot) {
+        console.log("SPOT =================>", newSpot);
+        res.send(newSpot);
       }, function(err) {
         res.send(err);
       });
@@ -24,6 +24,7 @@ module.exports = function(app, express, io) {
       res.send(404, message);
     });
   });
+
 
 
   // POST to request search results for a specific spot from SearchView.
@@ -52,7 +53,7 @@ module.exports = function(app, express, io) {
   // POST to create a new user from SignupView.
   app.post('/api/signup', function(req, res) {
     var user = {
-      username: req.body.username,
+      username: req.body.username.toLowerCase(),
       password: req.body.password,
       email: req.body.email
     };
@@ -69,7 +70,7 @@ module.exports = function(app, express, io) {
   // POST to submit user credentials from LoginView.
   app.post('/api/login', function(req, res) {
     var user = {
-      username: req.body.username,
+      username: req.body.username.toLowerCase(),
       password: req.body.password
     };
     helpers.signin(user, function(result) {
@@ -94,7 +95,7 @@ module.exports = function(app, express, io) {
       }, function (err) {
         if (id) {
           helpers.getProfile(id, function(result) {
-            res.json(result);
+            res.json({result: result, currentUser: false});
           }, function(err) {
             res.send(404);
           });
@@ -105,13 +106,33 @@ module.exports = function(app, express, io) {
     } else {
       console.log("no token");
       helpers.getProfile(id, function(result) {
-        res.json(result);
+        res.json({result: result, currentUser: false});
       }, function(err) {
         res.send(404);
       });
     }
   });
 
+  // PUT to update user's profile
+  app.put('/api/profile', function (req, res){
+    if (req.headers.token) {
+      helpers.checkToken(JSON.parse(req.headers.token), function (decoded) {
+        console.log('token verified');
+        var userId = decoded.userId.toString();
+        helpers.updateProfile(userId, req.body, function () {
+          res.sendStatus(202);
+        }, function (err) {
+          res.sendStatus(404);
+        });
+      }, function (err) {
+        console.log('invalid token');
+        res.send(404, 'invalid token');
+      });
+    } else {
+      console.log("no token");
+      res.send(404, 'user not signed in');
+    }
+  })
 
   // GET to retrieve a spot's information by spotId.
   app.get('/api/spot/:id', function(req, res) {
@@ -137,12 +158,24 @@ module.exports = function(app, express, io) {
 
   //post to follow a user
   app.post('/api/followUser', function(req, res) {
-    
+    var userId = req.body.userId;
+    var followUser = req.body.followUser;
+    helpers.followUser(userId, followUser, function(data) {
+      res.json(data);
+    }, function(err) {
+      res.send(404, err);
+    });
   });
 
   //post to save a users spot
   app.post('/api/saveSpot', function(req, res) {
-
+    var userId = req.body.userId;
+    var spotId = req.body.spotId;
+    helpers.saveSpot(userId, spotId, function(data) {
+      res.json(data);
+    }, function(err) {
+      res.send(404, err);
+    });
   });
 
   // Sockets
@@ -153,20 +186,16 @@ module.exports = function(app, express, io) {
 
     // Listen for whenever a new spot is created, and
     // broadcast spotAdded event to trigger client-side map refresh.
-    socket.on('addSpot', function(){
-      io.emit('spotAdded');
-
+    socket.on('newSpot', function(newSpot){
+      socket.broadcast.emit('spotDrop', newSpot);
+      console.log("new spot: ", newSpot);
     });
+
 
     /* Chat socket */
 
-    socket.on('hello', function(){
-      console.log('socket sez what up biotch');
-    });    
-
     // Listen for whenever a chat message is sent.
     socket.on('messageSend', function(message){
-      console.log("RECIEVED IN ROUTES", message);
       helpers.postMessageToDatabase(message.spotId, message.username, message.text, message.timeStamp);
       io.emit('newMessage', {username: message.username, text: message.text, spotId: message.spotId, timeStamp: message.timeStamp});
     });

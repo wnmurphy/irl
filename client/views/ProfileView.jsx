@@ -1,39 +1,48 @@
 /** @jsx React.DOM */
 
 var ProfileView = React.createClass({
-  getDefaultProps: function () {
-    return {
-      requireAuth: !window.location.hash.substring(10)
-    };
-  },
 
   getInitialState: function () {
-    return {
-      userId: window.location.hash.substring(10),
-      shareClass: "share-card-container",
-      buttonIcon: "fa fa-share-alt",
-      sharing: false
-    };
+    return this.updateState();
   },
 
-  componentDidMount: function () {
+  updateState: function () {
+    console.log('here ', !window.location.hash.substring(10));
+    var state = {
+      userId: window.location.hash.substring(10) || globalState.userId,
+      shareClass: "share-card-container",
+      buttonIcon: "fa fa-share-alt",
+      sharing: false,
+      editting: false,
+      requireAuth: !window.location.hash.substring(10)
+    };
+
     var context = this;
-    console.log("mount trigger", globalState.userId, this.state.userId);
-    ProfileController.getProfile(context.state.userId, function (profile) {
+    ProfileController.getProfile(state.userId, function (profile) {
       context.setState(profile);
+      if(profile.username) {
+        MetaController.setOGP({
+          title: profile.username + ' on irl',
+          description: profile.bio,
+          image: profile.img,
+          url: 'http://app.irl.events/#/profile/' + profile.userId
+        });
+      }
       context.setState({shareProps: {
-                          contents: 'Check out ' + profile.username + ' on this irl! www.irl.com/#/profile/' + profile.userId,
+                          contents: 'Check out ' + profile.username + ' on irl! app.irl.events/#/profile/' + profile.userId,
                           subject: 'Check out ' + profile.username,
-                          url: 'www.irl.com/#/profile/' + context.state.userId
+                          url: 'app.irl.events/#/profile/' + profile.userId
                         }});
     }, function (message) {console.log(message)});
+
+    return state;
   },
 
   post: function () {
     console.log("signIn triggered");
     this.setState({userId: globalState.userId}, function () {
       console.log("callback triggered");
-      this.componentDidMount();
+      this.setState(this.updateState());
     });
   },
 
@@ -51,13 +60,58 @@ var ProfileView = React.createClass({
     this.setState(newState);
   },
 
-  render: function() {
-    console.log("Rendering ProfileView");
-    if (this.props.requireAuth) {
-      var login = <LoginRequired parent={this} />;
+  followUser: function() {
+    FollowController.followUser(this.state.userId, function (data) {
+      console.log(data);
+    }, function (err) {
+      console.error(err);
+    });
+  },
+
+  toggleEdit: function () {
+    var editting = !this.state.editting;
+    console.log('toggled editting to', editting);
+    this.setState({
+      editting: editting
+    });
+  },
+
+  handleSubmit: function () {
+    this.toggleEdit();
+    ProfileController.updateProfile({bio: this.state.bio});
+  },
+
+  handleChange: function (event) {
+    var context = this;
+    var newState = {};
+
+    if (event.target.id === 'img') {
+      ProfileController.sendImage(event.target.files[0], function (image) {
+        context.setState({img: image});
+      });
     } else {
-      var login = null;
+      newState[event.target.id] = event.target.value;
+      this.setState(newState);
     }
+  },
+
+  handleFileInput: function () {
+    $('#img').click();
+  },
+
+  handleLogin: function () {
+    this.setState(this.updateState());
+  },
+
+  render: function() {
+
+    console.log("Rendering ProfileView");
+    var login = null;
+    console.log(this.state.requireAuth);
+    if (this.state.requireAuth) {
+      login = <LoginRequired parent={this} />;
+    }
+
 
     // shows only when signed in
     if (globalState.userId === this.state.userId) {
@@ -66,7 +120,7 @@ var ProfileView = React.createClass({
       var editButton = null
     }
 
-    var shareButton =  <div>
+    var shareButton =  (<div>
                     <div className={this.state.shareClass} onClick={this.toggleShare}>
                       <ShareCard shareProps={this.state.shareProps}/>
                     </div>
@@ -75,20 +129,76 @@ var ProfileView = React.createClass({
                         <i className={this.state.buttonIcon}></i>
                       </a>
                     </div>
-                  </div>
+                  </div>);
+
+    // handles how image, bio, and follow display
+    if (this.state.signedIn) {
+      var followButton = (<div className="follow-button" onClick={AuthController.signOut}>Sign Out</div>);
+      if(this.state.img) {
+        var style = {
+          'background-image': 'url(' + this.state.img + ')'
+        }
+
+        var profileImage = <div className="profile-picture add clickable" style={style} onClick={this.handleFileInput} >
+                            <input type="file" id="img" className="hide" onChange={this.handleChange} accept="image/*"/>
+                            <div className="change-image-message">Change image</div>
+                           </div>
+      } else {
+        var profileImage = (<div className="no-profile-picture add clicakable" onClick={this.handleFileInput}>
+                              <div>
+                                <i className="fa fa-plus" /><br />Add an image
+                              </div>
+                              <input type="file" id="img" className="hide" onChange={this.handleChange} accept="image/*"/>
+                            </div>);
+      }
+    } else {
+      var followButton = (<div className="follow-button" onClick={this.followUser}>Follow {this.state.username}</div>);
+      if(this.state.img) {
+        var profileImage = <div className="profile-picture" style={style} />
+      } else {
+        var profileImage = (<div className="no-profile-picture">
+                              <p>No image</p>
+                            </div>);
+      }
+    }
+
+    // Handles editing bio
+    if (this.state.editting) {
+      var bio =
+        <div className="bio-input-container">
+          <input type="textbox" id='bio' className="bio-input" defaultValue={this.state.bio} onChange={this.handleChange}></input>
+          <div className="save-button" onClick={this.handleSubmit}>Save changes</div>
+        </div>
+    } else {
+      if (this.state.signedIn) {
+        var editable = this.toggleEdit;
+        var bioClass = "profile-bio clickable";
+        var editMsg = <span className="edit-message"> tap to edit</span>;
+      } else {
+        var editable = null;
+        var bioClass = "profile-bio";
+        var editMsg = null;
+      }
+      var bio = <h3 className={bioClass} onClick={editable}>{this.state.bio}{editMsg}</h3>
+    }
+
+
 
     return (
       <div className="profile-view">
         <div className="profile-header">
-          <img className="profile-picture" src={this.state.img} />
-          <div className="profile-name">
-            <h1>{this.state.username}</h1>
+          {profileImage}
+          <div>
+            <div className="profile-name">
+              <h1>{this.state.username}</h1>
+            </div>
+            {followButton}
           </div>
         </div>
-        <h3 className="profile-bio">{this.state.bio}</h3>
+        {bio}
         <table className="profile-stats">
           <tr>
-            <td className="stat">{this.state.spots}</td>
+            <td className="stat">{this.state.spotCount}</td>
             <td className="divider" />
             <td className="stat">{this.state.followers}</td>
           </tr>

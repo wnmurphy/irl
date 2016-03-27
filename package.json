@@ -25,7 +25,6 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.0",
     "bower": "1.7.7",
-    "chai": "^3.5.0",
     "express": "^4.13.4",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
@@ -33,22 +32,24 @@
     "gulp-react": "^3.1.0",
     "gulp-sass": "^2.2.0",
     "gulp-uglify": "^1.5.3",
-    "jsdom": "^8.1.0",
     "jsonwebtoken": "^5.7.0",
-    "mocha": "^2.4.5",
-    "mocha-phantomjs": "^4.0.2",
     "morgan": "^1.7.0",
     "node-env-file": "^0.1.8",
     "react": "^0.14.7",
-    "react-addons-test-utils": "^0.14.7",
     "request": "^2.69.0",
+    "sharp": "^0.13.1",
     "socket.io": "^1.4.5"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "jest": "^0.1.40",
+    "jsdom": "^8.1.0",
+    "mocha": "^2.4.5",
+    "mocha-phantomjs": "^4.0.2",
     "pre-commit": "^1.1.2",
     "react": "^0.14.7",
     "react-addons-test-utils": "^0.14.7",
     "react-dom": "^0.14.7"
-  }
+  },
+  "engine": "node 5.5.0"
 }

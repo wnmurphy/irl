@@ -1,24 +1,29 @@
 /** @jsx React.DOM */
 
 var SpotView = React.createClass({
+
   getInitialState: function() {
     var hash = window.location.hash.substr(1);
     return {
       spotHash: hash,
+      // Define default text for sharing a spot.
       shareProps: {
-        contents: 'Check out this Spot! www.irl.com/#' + hash,
+        contents: 'Check out this Spot! app.irl.events/#' + hash,
         subject: 'Check out irl',
-        url: 'www.irl.com/#' + hash
+        url: 'app.irl.events/#' + hash
       },
       spot: {},
       shareClass: "share-card-container",
       buttonIcon: "fa fa-share-alt",
       sharing: false,
       showChat: "",
-      messages: []
+      messages: [],
+      login: 'hide'
     };
   },
 
+  // Load spot's data from server via AJAX.
+  // Load spot's chat messages via socket.
   componentDidMount: function() {
     var context = this;
     this.getSpot();
@@ -26,11 +31,12 @@ var SpotView = React.createClass({
     this.setState({spotId: id});
     socket.emit('populateChat', id);
     socket.on('returnChat', function(data) {
-      console.log("RETURN DATA ======>", data);
       context.setState({messages: data});
     })
   },
 
+  // Defines AJAX call to server to retrieve spot data.
+  // Adds a new map marker if successful.
   getSpot: function() {
     var context = this;
 
@@ -38,18 +44,24 @@ var SpotView = React.createClass({
 
     $.ajax({
       method: 'GET',
-      //refactor to get correct spotId
       url: '/api' + context.state.spotHash,
       dataType: 'json',
       success: function (data) {
         console.log("data: ", data);
         context.setState({spot: data});
         console.log("SUCCESS: ", context.state.spot);
+        MetaController.setOGP({
+          title: context.state.spot.name,
+          description: context.state.spot.description
+        });
         context.setState({loading: false});
+        context.setState({creatorId: "/#/profile/" + data.creatorId});
         initMap(data.location, context, function(map, position, marker) {
           map.setOptions({zoomControl: false});
-          marker.setIcon('/pin_test.png');
+          marker.setIcon('/img/map/pin_test.png');
         });
+        var durationTime = timeController.msToDuration(Number(data.end));
+        context.setState({end: durationTime});
       },
       error: function (error) {
         console.log("ERROR: ", error);
@@ -58,6 +70,7 @@ var SpotView = React.createClass({
     });
   },
 
+  // Open share card when user clicks Share button.
   toggleShare: function () {
     var sharing = !this.state.sharing;
     var newState = {sharing: sharing};
@@ -72,6 +85,7 @@ var SpotView = React.createClass({
     this.setState(newState);
   },
 
+  // Open chat card when user clicks chat button.
   toggleChat: function (){
     if(this.state.showChat === ""){
       this.setState({
@@ -85,10 +99,32 @@ var SpotView = React.createClass({
      });
     }
   },
+  checkAuth: function() {
+    if (localStorage.getItem('token')) {
+      this.post();
+    } else {
+      this.setState({login: 'show'});
+    }
+  },
+
+  post: function() {
+    SaveSpotController.saveSpot(this.state.spotId, function(spot) {
+      console.log(spot);
+    }, function(err) {
+      console.error(err);
+    });
+  },
 
   render: function() {
-    
+
     var chatContainerClass = "chat-card-container";
+
+    console.log(this.state.spot.end);
+    if (this.state.spot.end) {
+      var end = <p style={{'font-style': 'italic', 'font-size': '14px'}}>{this.state.end}</p>
+    } else {
+      var end = null;
+    }
 
     return (
       <div className="spot-container">
@@ -102,11 +138,14 @@ var SpotView = React.createClass({
             </div>
             <span className='spot-name'>{this.state.spot.name}</span>
           </div>
-          <h3>@{this.state.spot.start}</h3>
-          <h4>created by: {this.state.spot.creator}</h4>
-          <p>description: {this.state.spot.description}</p>
-          <p>address: {this.state.spot.address}</p>
-          <input type="button" value="show chat" onClick={this.toggleChat} />
+          <h3>@{" " + timeController.msToTime(this.state.spot.start)}</h3>
+          {end}
+          <h4>created by: <a href={this.state.creatorId} className="spot-view-creatorid">{this.state.spot.creator}</a></h4>
+          <p>{this.state.spot.description}</p>
+          <p>{this.state.spot.address}</p>
+            <DirectionsLink location={this.state.spot.location} />
+            <div className='button' onClick={this.checkAuth}><i className="material-icons">check_circle</i>&nbsp;Save spot</div>
+            <div className='button' onClick={this.toggleChat}><i className="material-icons">message</i>&nbsp;show chat</div>
         </div>
         <div className={this.state.shareClass} onClick={this.toggleShare}>
           <ShareCard shareProps={this.state.shareProps}/>
@@ -120,7 +159,9 @@ var SpotView = React.createClass({
         <div className={chatContainerClass + this.state.showChat}>
           <Chat messages={this.state.messages} spotId={this.state.spotId}/>
         </div>
-
+        <div className={this.state.login}>
+          <LoginRequired parent={this} />
+        </div>
       </div>
     );
   }

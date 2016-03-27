@@ -6,7 +6,12 @@
     <!-- Fixes scaling issues on iOS -->
     <meta name = "viewport" content = "user-scalable=no, width=device-width">
     <meta name="mobile-web-app-capable" content="yes">
-    <link href="/big-icon.png" rel="icon" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="translucent">
+    <link href="/img/icons/big-icon.png" rel="icon" />
+    <link rel="apple-touch-icon" href="/img/icons/ios-icon.png">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="irl" />
 
     <title>irl</title>
 
@@ -35,8 +40,12 @@
     <script type="text/javascript" src="/controllers/AuthController.js"></script>
     <script type="text/javascript" src="/controllers/ProfileController.js"></script>
     <script type="text/javascript" src="/controllers/FeedController.js"></script>
+    <script type="text/javascript" src="/controllers/MetaController.js"></script>
+    <script type="text/javascript" src="/controllers/FollowController.js"></script>
+    <script type="text/javascript" src="/controllers/SaveSpotController.js"></script>
     <script type="text/javascript" src="/dist/src/components/Toast.js"></script>
     <script type="text/javascript" src="/dist/src/components/ChatCard.js"></script>
+    <script type="text/javascript" src="/dist/src/components/DirectionsLink.js"></script>
     <script type="text/javascript" src="/dist/src/views/SpotView.js"></script>
     <script type="text/javascript" src="/dist/src/views/MapView.js"></script>
     <script type="text/javascript" src="/dist/src/views/FeedView.js"></script>

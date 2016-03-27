@@ -2,19 +2,50 @@ var ProfileController = {
   getProfile: function (id, success, fail) {
     // Should be sending an ajax call to the server.
     if (id) {
-      var dummyProfile = {
-        userId: 1,
-        username: "jedijashwa",
-        bio: "Josh is a full stack developer hosting cool events all over Phoenix!",
-        img: "https://pbs.twimg.com/profile_images/667799262827184128/SAymeDag.jpg",
-        followers: 127,
-        spots: 562
-      };
+      $.ajax({
+        method: 'GET',
+        url: '/api/profile/' + id,
+        dataType: 'json',
+        success: function (data) {
+          console.log('data: ', data);
+          var user = data.result;
+          user.signedIn = data.currentUser;
+          console.log('user: ', user);
+          success(user);
+        },
+        error: function (error) {
+          fail(error.responseText);
+        }
+      });
     } else {
-      var dummyProfile = {};
+      success({});
+    }
+  },
+
+  updateProfile: function (profile) {
+    console.log(profile);
+    $.ajax({
+      method: 'PUT',
+      url: '/api/profile',
+      data: profile,
+      success: function (data) {
+        console.log(data);
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  },
+
+  sendImage: function (file, success) {
+    console.log('file input', file);
+    var reader = new FileReader();
+
+    reader.onload = function (upload) {
+      success(upload.target.result);
+      ProfileController.updateProfile({img: upload.target.result});
     }
 
-
-    success(dummyProfile);
+    reader.readAsDataURL(file);
   }
 };

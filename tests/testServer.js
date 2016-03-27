@@ -9,11 +9,11 @@ var dbSchema = new aws.DynamoDB.DocumentClient();
 var serverURI = 'http://localhost:' + (process.env.PORT || 8080);
 
 aws.config.update({
-      accessKeyId: "fakeAccessKey",
-      secretAccessKey: "fakeSecretAccessKey",
-      region: "fakeRegion",
-      endpoint: new aws.Endpoint('http://localhost:8000')
-    });
+  accessKeyId: "fakeAccessKey",
+  secretAccessKey: "fakeSecretAccessKey",
+  region: "fakeRegion",
+  endpoint: new aws.Endpoint('http://localhost:8000')
+});
 
 describe("Persistent Spot and User Server", function() {
   beforeEach(function(done) {
@@ -26,6 +26,7 @@ describe("Persistent Spot and User Server", function() {
         category: 'entertainment',
         location: 'Arizona',
         description: 'test createSpot',
+        description_lc: 'test createSpot',
         start: '10'
       }
     };
@@ -37,7 +38,12 @@ describe("Persistent Spot and User Server", function() {
         userId: 999999999999,
         username: 'Johnny',
         password: 'password',
-        email: 'test@gmail.com'
+        email: 'test@gmail.com',
+        followers: [],
+        following: [],
+        spotCount: 0,
+        bio: 'empty',
+        img: 'fake'
         } 
       };
       dbSchema.put(params, function(err, data) {
@@ -146,7 +152,7 @@ describe("Persistent Spot and User Server", function() {
     });
   });
 
-  xit('should return a 200 when getting a spot', function(done) {
+  it('should return a 200 when getting a spot', function(done) {
     request({
       method: "GET",
       // uri: "http://localhost:8080/api/spot/999999999999"
@@ -162,7 +168,7 @@ describe("Persistent Spot and User Server", function() {
       done();
     });
   });
-  xit('should return a 200 when getting a user\'s profile', function(done) {
+  it('should return a 200 when getting a user\'s profile', function(done) {
     request({
       method: "GET",
       uri: serverURI + "/api/profile/999999999999"
@@ -171,9 +177,10 @@ describe("Persistent Spot and User Server", function() {
         console.error("Error getting Johnny's profile ", err);
       }
       body = JSON.parse(body);
+      console.log("test body: ", body);
       expect(res.statusCode).to.equal(200);
-      expect(body.userId).to.equal(999999999999);
-      expect(body.username).to.equal('Johnny');
+      expect(body.result.userId).to.equal(999999999999);
+      expect(body.result.username).to.equal('Johnny');
       done();
     });
   });
@@ -195,7 +202,7 @@ describe("Persistent Spot and User Server", function() {
       done();
     });
   });
-  xit('should be able to serve the main page', function(done) {
+  it('should be able to serve the main page', function(done) {
     request({
       method: "GET",
       // uri: "http://localhost:8080/"
@@ -221,6 +228,7 @@ describe("Persistent Spot and User Server", function() {
         category: 'entertainment',
         location: 'Montana',
         description: 'test createSpot',
+        description_lc: 'test createSpot',
         start: '10'
       }
     }, function(err, res, body){

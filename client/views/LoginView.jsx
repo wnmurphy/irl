@@ -26,7 +26,6 @@ var LoginView = React.createClass({
   },
 
   render: function() {
-    console.log("Rendering LoginView");
     return (
       <div>
         <form onSubmit={this.handleSubmit} onChange={this.handleChange}>

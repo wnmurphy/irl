@@ -85,8 +85,8 @@ var LoginCard = React.createClass({
         <form onSubmit={this.handleSubmit} onChange={this.handleChange}>
           <input name="username" type="text" placeholder="Username" required />
           <input name="password" type="password" placeholder="Password" required />
-          <input type="submit" value="Log In"/>
-          <input type="button" onClick={this.toggleCard} value="Create Account"></input>
+          <div className="button" onClick={this.handleSubmit}>Log In</div>
+          <div className="button" onClick={this.toggleCard}>Create Account</div>
         </form>
         <Toast message={this.state.response} />
       </div>
@@ -132,8 +132,8 @@ var SignupCard = React.createClass({
           <input name="username" type="text" placeholder="Username" required />
           <input name="email" type="email" placeholder="Email" required />
           <input name="password" type="password" placeholder="Password" required />
-          <input type="submit" value="Signup"/>
-          <input type="button" onClick={this.toggleCard} value="Existing Account"></input>
+          <div className="button" onClick={this.handleSubmit}>Signup</div>
+          <div className="button" onClick={this.toggleCard}>Existing Account</div>
         </form>
         <Toast message={this.state.response} />
       </div>

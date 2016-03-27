@@ -8,7 +8,6 @@ var browserHistory = useRouterHistory(createHashHistory)({queryKey: false});
 var socket = io.connect();
 
 socket.on('connect', function(){
-  console.log('client-side socket connection created');
   socket.emit('hello');
 });
 
