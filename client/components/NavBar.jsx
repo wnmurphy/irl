@@ -1,4 +1,5 @@
 // Renders bottom nav menu.
+
 var NavButton = React.createClass({
   getInitialState: function () {
     var linkClass = '';
@@ -34,7 +35,7 @@ var NavBar = React.createClass({
     });
     
     //navbar is defined in app.jsx
-    navbar = this;
+    window.navbar = this;
     this.activate();
     
   },

@@ -14,7 +14,7 @@ socket.on('connect', function () {
 });
 
 var globalState = {};
-var navbar;
+
 
 var categories = {
   General: "fa fa-asterisk",
