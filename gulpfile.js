@@ -4,6 +4,7 @@ var uglify = require('gulp-uglify');
 var react = require('gulp-react');
 var html = require('gulp-html-replace');
 var sass = require('gulp-sass');
+var iife = require('gulp-iife');
 
 var path = {
   all: [
@@ -103,6 +104,10 @@ gulp.task('build', function() {
   .pipe(react())
   .pipe(concat(path.minified_out))
   .pipe(uglify())
+  .pipe(iife({
+    params: ['window', 'document', '$', 'React', 'ReactoRouter', 'History'],
+    args:['window', 'document', 'window.$','window.React', 'window.ReactRouter', 'window.History']
+  }))
   .pipe(gulp.dest(path.dest_build));
 });
 
