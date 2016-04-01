@@ -32,7 +32,6 @@ bower_components/
 
 client/dist
 client/lib
-<<<<<<< HEAD
 tests/*.js
 !tests/testServer.js
 

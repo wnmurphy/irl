@@ -1,6 +1,7 @@
 # irl
 
-> Ultra-local, time-limited event sharing. Find immediate experiences nearby. Create experiences for the people around you. Live more of your life.
+> irl is an ultra-local live feed of interesting events happening near you, today.
+> Browse spots, create spots, share spots.
 
 ## Team
 
@@ -26,12 +27,9 @@ To install locally:
 1. Download and install [Java SDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
 1. Download and install the [DynamoDB JAR](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.DynamoDBLocal.html).
 1. Run DynamoDB to create a local database.
-1. Install 'libvips' `brew install homebrew/science/vips --with-imagemagick --with-webp`
 1. Install dependencies.
 1. Run `nodemon sesrver/server.js` to start the server.
 1. Visit [localhost:8080](localhost:8080).
-
-
 
 ## Requirements
 

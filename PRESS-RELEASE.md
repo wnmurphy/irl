@@ -13,11 +13,11 @@
 
 ## How to Get Started ##
   To see what's out there, just start browsing the map!
-  
+
   You can filter by spot category (food, entertainment, etc.) right on the map. You can also search for a particular spot or user.
-  
+
   To create and share a spot, click or tap the plus button in the upper-right corner of the screen.
-  
+
   Choose a category and fill in the details. Then you can share the spot via Twitter, Facebook, Google+, email, or SMS message.
 
 ## From our users: ##
@@ -30,4 +30,4 @@
   > "irl lets me share my gigs to fans of local live music. I can create a spot for my gig tomorrow, and people looking for something to do get the notification on their feed. I've been getting a lot more subscribers lately, which is great because it encourages local musicians like me to keep gigging." -Bill, Jazz Guitarist
 
 ## Get Started! ##
-  irl makes it easy to live more. [Try irl now](http://irl.com) and see what's irling!
+  irl makes it easy to live more. [Try irl now](http://www.irl.events) and see what's happening!
