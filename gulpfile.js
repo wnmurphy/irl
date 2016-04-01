@@ -103,7 +103,7 @@ gulp.task('build', function() {
   gulp.src(path.concat)
   .pipe(react())
   .pipe(concat(path.minified_out))
-  // .pipe(uglify())
+  .pipe(uglify())
   .pipe(iife({
     params: ['window', 'document', '$', 'React', 'ReactoRouter', 'History'],
     args:['window', 'document', 'window.$','window.React', 'window.ReactRouter', 'window.History']
