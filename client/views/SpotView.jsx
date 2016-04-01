@@ -133,9 +133,9 @@ var SpotView = React.createClass({
         <div className="create-map-view-container">
           <div id="map">
           </div>
-          <div className="spot-view-address">
-            <p>{this.state.spot.address}</p>
-          </div>
+            <div className="spot-view-address">
+              <p>{this.state.spot.address}</p>
+           </div>
         </div>
         <div className='spot-view-container'>
           <p className='spot-view-name'>{this.state.spot.name}</p>
@@ -145,7 +145,7 @@ var SpotView = React.createClass({
           <p className='spot-view-category'><i className={categories[this.state.spot.category]}></i></p>
           <p className='spot-view-about'>About This Spot</p>
           <div className='description-container'>
-            <p className='spot-view-description'></p>
+            <p className='spot-view-description'>{this.state.spot.description}</p>
           </div>
             <div className='button-container'>
               <DirectionsLink location={this.state.spot.location} />
